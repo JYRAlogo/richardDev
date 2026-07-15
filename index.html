@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HUB // diretório</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #0a0a0b;
+    --panel: #121214;
+    --panel-hi: #19191c;
+    --yellow: #f5c518;
+    --yellow-dim: #b89412;
+    --white: #ededec;
+    --gray: #8a8a8f;
+    --line: #232326;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{
+    scroll-behavior:smooth;
+    background:var(--black);
+  }
+
+  body{
+    background:var(--black);
+    color:var(--white);
+    font-family:'Space Grotesk',sans-serif;
+    overflow-x:hidden;
+    cursor:none;
+  }
+
+  ::selection{ background:var(--yellow); color:var(--black); }
+
+  a{ color:inherit; text-decoration:none; }
+
+  /* ---------- custom cursor ---------- */
+  .cursor-dot, .cursor-ring{
+    position:fixed;
+    top:0; left:0;
+    pointer-events:none;
+    z-index:9999;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    will-change:transform;
+  }
+  .cursor-dot{
+    width:6px; height:6px;
+    background:var(--yellow);
+    transition:opacity .2s ease;
+  }
+  .cursor-ring{
+    width:34px; height:34px;
+    border:1px solid rgba(245,197,24,.55);
+    transition:width .25s ease, height .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .cursor-ring.hover{
+    width:56px; height:56px;
+    background:rgba(245,197,24,.08);
+    border-color:var(--yellow);
+  }
+  @media (hover:none), (pointer:coarse){
+    .cursor-dot, .cursor-ring{ display:none; }
+    body{ cursor:auto; }
+  }
+
+  /* ---------- grain / glow bg ---------- */
+  .bg-glow{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(600px circle at 15% 10%, rgba(245,197,24,.07), transparent 60%),
+      radial-gradient(500px circle at 85% 30%, rgba(245,197,24,.05), transparent 55%);
+  }
+
+  /* ---------- layout shell ---------- */
+  header{
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 6vw;
+    background:rgba(10,10,11,.75);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    font-family:'JetBrains Mono',monospace;
+    font-size:15px;
+    letter-spacing:.08em;
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo span{ color:var(--yellow); }
+  .logo::before{
+    content:"";
+    width:8px; height:8px;
+    background:var(--yellow);
+    display:inline-block;
+    box-shadow:0 0 12px var(--yellow);
+  }
+  nav{ display:flex; gap:34px; font-size:13px; font-family:'JetBrains Mono',monospace; color:var(--gray); }
+  nav a{ position:relative; transition:color .25s; }
+  nav a:hover{ color:var(--yellow); }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    z-index:1;
+    padding:15vh 6vw 12vh;
+    max-width:1200px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--yellow);
+    letter-spacing:.18em;
+    display:flex; align-items:center; gap:12px;
+    margin-bottom:26px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:26px; height:1px;
+    background:var(--yellow);
+  }
+  h1{
+    font-size:clamp(42px, 7vw, 88px);
+    line-height:1.02;
+    font-weight:700;
+    letter-spacing:-.02em;
+  }
+  h1 em{
+    font-style:normal;
+    color:var(--yellow);
+  }
+  .hero p{
+    margin-top:26px;
+    max-width:520px;
+    color:var(--gray);
+    font-size:16px;
+    line-height:1.65;
+  }
+  .hero-meta{
+    margin-top:56px;
+    display:flex;
+    gap:48px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--gray);
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    max-width:640px;
+  }
+  .hero-meta b{
+    display:block;
+    color:var(--white);
+    font-size:20px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    margin-bottom:4px;
+  }
+
+  /* ---------- section label ---------- */
+  .section-label{
+    display:flex; align-items:center; gap:16px;
+    padding:0 6vw;
+    margin:8vh 0 34px;
+    color:var(--gray);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:.14em;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+
+  /* ---------- grid ---------- */
+  .grid{
+    position:relative; z-index:1;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin:0 6vw 14vh;
+  }
+  .card{
+    position:relative;
+    background:var(--panel);
+    padding:34px 28px;
+    min-height:190px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    overflow:hidden;
+    transition:background .35s ease;
+    opacity:0;
+    transform:translateY(18px);
+  }
+  .card.visible{
+    animation:rise .6s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  @keyframes rise{
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg, rgba(245,197,24,.09), transparent 55%);
+    opacity:0;
+    transition:opacity .35s ease;
+  }
+  .card:hover{ background:var(--panel-hi); }
+  .card:hover::before{ opacity:1; }
+  .card .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--yellow-dim);
+    letter-spacing:.1em;
+  }
+  .card h3{
+    font-size:26px;
+    font-weight:600;
+    margin-top:14px;
+    transition:color .25s ease, transform .25s ease;
+  }
+  .card:hover h3{ color:var(--yellow); transform:translateX(4px); }
+  .card .desc{
+    color:var(--gray);
+    font-size:13.5px;
+    margin-top:10px;
+    line-height:1.5;
+  }
+  .card .foot{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:26px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--gray);
+  }
+  .card .arrow{
+    display:inline-block;
+    transition:transform .3s ease;
+    color:var(--yellow);
+  }
+  .card:hover .arrow{ transform:translateX(6px); }
+
+  /* ---------- footer ---------- */
+  footer{
+    position:relative; z-index:1;
+    padding:6vh 6vw 5vh;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:20px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--gray);
+  }
+  footer .yellow-dot{ color:var(--yellow); }
+
+  @media (max-width:720px){
+    nav{ display:none; }
+    .hero-meta{ flex-wrap:wrap; gap:28px; }
+  }
+
+  /* ---------- modal ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    z-index:200;
+    background:rgba(6,6,7,.72);
+    backdrop-filter:blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+    padding:24px;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+
+  .modal{
+    width:100%;
+    max-width:560px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    position:relative;
+    transform:translateY(24px) scale(.98);
+    opacity:0;
+    transition:transform .35s cubic-bezier(.22,1,.36,1), opacity .35s ease;
+  }
+  .overlay.open .modal{ transform:translateY(0) scale(1); opacity:1; }
+
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:24px 28px;
+    border-bottom:1px solid var(--line);
+  }
+  .modal-head .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--yellow-dim);
+    letter-spacing:.1em;
+    display:block;
+    margin-bottom:8px;
+  }
+  .modal-head h2{
+    font-size:26px;
+    font-weight:600;
+  }
+  .modal-close{
+    width:36px; height:36px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--gray);
+    font-family:'JetBrains Mono',monospace;
+    font-size:16px;
+    cursor:none;
+    display:flex; align-items:center; justify-content:center;
+    transition:.25s ease;
+    flex-shrink:0;
+  }
+  .modal-close:hover{ border-color:var(--yellow); color:var(--yellow); }
+
+  .modal-list{
+    padding:10px 0;
+  }
+  .modal-item{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px;
+    padding:20px 28px;
+    border-bottom:1px solid var(--line);
+    transition:background .25s ease;
+  }
+  .modal-item:last-child{ border-bottom:none; }
+  .modal-item:hover{ background:var(--panel-hi); }
+
+  .modal-item .info{ display:flex; align-items:center; gap:16px; }
+  .modal-item .num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    color:var(--gray);
+    width:20px;
+  }
+  .modal-item .name{
+    font-size:16px;
+    font-weight:500;
+  }
+  .modal-item .dl{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    letter-spacing:.06em;
+    color:var(--black);
+    background:var(--yellow);
+    padding:9px 16px;
+    border:1px solid var(--yellow);
+    transition:.25s ease;
+    white-space:nowrap;
+  }
+  .modal-item .dl:hover{
+    background:transparent;
+    color:var(--yellow);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="bg-glow"></div>
+
+<header>
+  <div class="logo">HUB<span>.dir</span></div>
+  <nav>
+    <a href="#categorias">categorias</a>
+    <a href="#sobre">sobre</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">DIRETÓRIO CENTRAL // 10 CATEGORIAS</div>
+  <h1>Tudo num<br>só lugar, <em>organizado.</em></h1>
+  <p>Um hub central com tudo que a comunidade precisa — bots, sites, cursos, tutoriais e muito mais, reunidos em um único diretório rápido e direto ao ponto.</p>
+
+  <div class="hero-meta">
+    <div><b>10</b>categorias ativas</div>
+    <div><b>24/7</b>disponibilidade</div>
+    <div><b>v2.0</b>versão atual</div>
+  </div>
+</section>
+
+<div class="section-label" id="categorias">CATEGORIAS</div>
+
+<div class="grid" id="grid">
+  <!-- cards injected by JS -->
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <span class="tag" id="modalTag">00</span>
+        <h2 id="modalTitle">Categoria</h2>
+      </div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-list" id="modalList"></div>
+  </div>
+</div>
+
+<footer id="sobre">
+  <div><span class="yellow-dot">●</span> richardHub by:richardDev — diretório da comunidade</div>
+  <div>feito com foco em velocidade e clareza C:7m</div>
+</footer>
+
+<script>
+  // ==========================================================
+  // ⚙️ EDITE AQUI: nomes e links de download de cada item.
+  // Cada categoria tem 3 itens. Troque "Inserir nome" pelo
+  // nome real e "#" pelo link de download correspondente.
+  // ==========================================================
+  const categories = [
+    { tag:"01", name:"Bots", desc:"Automação e utilidades para o servidor.",
+      items:[
+        { name:"Bot da Zyra Vendas", url:"https://www.mediafire.com/file/0pedim99w6hcoan/Zyra.zip/file" },
+        { name:"Bot da GoatzPro Vendas", url:"https://www.mediafire.com/file/2mmcgtnbuyq1e5f/Goatzpro.zip/file" },
+        { name:"Pack de Bot", url:"https://www.mediafire.com/file/wqbzqgiwa4jgzsm/pack_basico.zip/file" },
+      ]
+    },
+    { tag:"02", name:"Sites", desc:"Páginas e plataformas selecionadas.",
+      items:[
+        { name:"Gerador de Descrições", url:"https://product-description-generator--jaljuj422.replit.app/" },
+        { name:"Site qui cria foto personalizado", url:"https://jcarte.lovable.app/" },
+        { name:"Site para vc assistir filmes", url:"https://www.watchparty.me/" },
+      ]
+    },
+    { tag:"03", name:"Cursos", desc:"Material de estudo e formação.",
+      items:[
+        { name:"Lua", url:"https://www.youtube.com/watch?v=xhH5-4S8uoU&list=PLHpkt9fDv8d_t0Jg-Wb5jQdTt4x344biG" },
+        { name:"Python", url:"https://www.youtube.com/watch?v=S9uPNppGsGo&list=PLvE-ZAFRgX8hnECDn1v9HNTI71veL3oW0" },
+        { name:"JavaScript", url:"https://www.youtube.com/watch?v=vEwPnjqWQ-g&list=PL2Fdisxwzt_d590u3uad46W-kHA0PTjjw" },
+      ]
+    },
+    { tag:"04", name:"Tutoriais", desc:"Guias passo a passo da comunidade.",
+      items:[
+        { name:"Como otimizar orbs", url:"https://www.youtube.com/watch?v=x3DA3ZoyY3w" },
+        { name:"Como jogar meccha chameleon mobile", url:"https://youtu.be/jOLO0yh0f3M?si=qUGbjqyhDgu1lFEq" },
+        { name:"Como jogar homem aranha igual aquele de ps4", url:"https://youtu.be/DHLLngAI1Hk?si=DaIJIWd2TWZ8JYc_" },
+      ]
+    },
+    { tag:"05", name:"Links", desc:"Referências rápidas e atalhos úteis.",
+      items:[
+        { name:"YT Premium", url:"https://www.youtube.com/premium?utm_source=yt_brand&utm_medium=SYApFBLbuwp5njw" },
+        { name:"gen Stream", url:"https://genstreamings.lovable.app/" },
+        { name:"Modelo de loja pronta", url:"https://discord.new/QhjQnZ7z6FN7" },
+      ]
+    },
+    { tag:"06", name:"Códigos", desc:"Snippets e repositórios compartilhados.",
+      items:[
+        { name:"Em breve", url:"" },
+        { name:"Em breve", url:"" },
+        { name:"Em breve", url:"" },
+      ]
+    },
+    { tag:"07", name:"Extensões", desc:"Complementos para navegador e apps.",
+      items:[
+        { name:"Block de anuncio", url:"https://play.google.com/store/apps/details?id=com.tafayor.appwatch" },
+        { name:"Token Login", url:"https://chromewebstore.google.com/detail/discord-token-login/kfjglmgfjedhhcddpfgfogkahmenikan" },
+        { name:"FancyGPT", url:"https://chrome.google.com/webstore/detail/sharegpt-share-your-chatg/daiacboceoaocpibfodeljbdfacokfjb?hl=en-GB" },
+      ]
+    },
+    { tag:"08", name:"Ch3ckers", desc:"Ferramentas de verificação.",
+      items:[
+        { name:"Checador de Hotmail/Outlook", url:"https://mega.nz/file/ucEREbTR#PC-TljDZMi_yYXZcUMX0gSfu6DJ8D537azTfBGV3A4s" },
+        { name:"GERADOR LINK NITRO", url:"https://discord-nitro-magic.lovable.app/" },
+        { name:"Ichecker netflix", url:"https://github.com/g3th/Netflix-Checker" },
+      ]
+    },
+    { tag:"09", name:"Apps", desc:"Aplicativos recomendados.",
+      items:[
+        { name:"FILMES E SÉRIE GRÁTIS", url:"https://play.google.com/store/apps/details?id=app.tln.plus&hl=pt_BR" },
+        { name:"APPS GTA RP", url:"https://www.mediafire.com/file/io1spak0o9khhtn/Acesso+a+Rockstar.apk/file" },
+        { name:"🟢 UNITV FREE", url:"https://www.mediafire.com/file_premium/mqatb09un7ue24j/UniTV_Free_5.6.2_SEM_LOGIN_modapksbrasil.blogspot.com.apk/file" },
+      ]
+    },
+    { tag:"10", name:"Games", desc:"Jogos e conteúdo relacionado.",
+      items:[
+        { name:"Terraria", url:"https://terariaapk.com/#google_vignette" },
+        { name:"Read Dead", url:"https://apkvision.org/games/action/red-dead-redemption-28496/" },
+        { name:"TODOS OS JOGOS DO WINDOWS 7 PRA WINDOWS 10 E 11", url:"https://win7games.com/" },
+      ]
+    },
+  ];
+
+  const grid = document.getElementById('grid');
+  categories.forEach((c, idx)=>{
+    const card = document.createElement('div');
+    card.className = "card";
+    card.dataset.index = idx;
+    card.innerHTML = `
+      <div>
+        <div class="tag">${c.tag}</div>
+        <h3>${c.name}</h3>
+        <div class="desc">${c.desc}</div>
+      </div>
+      <div class="foot">
+        <span>ABRIR</span>
+        <span class="arrow">→</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // ---------- modal logic ----------
+  const overlay = document.getElementById('overlay');
+  const modalTag = document.getElementById('modalTag');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalList = document.getElementById('modalList');
+  const modalClose = document.getElementById('modalClose');
+
+  function openModal(cat){
+    modalTag.textContent = cat.tag;
+    modalTitle.textContent = cat.name;
+    modalList.innerHTML = cat.items.map((it, i)=>`
+      <div class="modal-item">
+        <div class="info">
+          <span class="num">0${i+1}</span>
+          <span class="name">${it.name}</span>
+        </div>
+        <a class="dl" href="${it.url}" target="_blank" rel="noopener">BAIXAR</a>
+      </div>
+    `).join('');
+    overlay.classList.add('open');
+  }
+
+  function closeModal(){ overlay.classList.remove('open'); }
+
+  grid.addEventListener('click', e=>{
+    const card = e.target.closest('.card');
+    if(!card) return;
+    openModal(categories[card.dataset.index]);
+  });
+
+  modalClose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e=>{
+    if(e.target === overlay) closeModal();
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key === "Escape") closeModal();
+  });
+
+  // ---------- reveal on scroll ----------
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach((entry, i)=>{
+      if(entry.isIntersecting){
+        setTimeout(()=> entry.target.classList.add('visible'), i * 40);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold:.15 });
+  document.querySelectorAll('.card').forEach(c=> io.observe(c));
+
+  // ---------- smooth custom cursor ----------
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mouseX=0, mouseY=0, ringX=0, ringY=0;
+
+  window.addEventListener('mousemove', e=>{
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + "px";
+    dot.style.top = mouseY + "px";
+  });
+
+  function animateRing(){
+    ringX += (mouseX - ringX) * 0.16;
+    ringY += (mouseY - ringY) * 0.16;
+    ring.style.left = ringX + "px";
+    ring.style.top = ringY + "px";
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, .card, .modal-close, button').forEach(el=>{
+    el.addEventListener('mouseenter', ()=> ring.classList.add('hover'));
+    el.addEventListener('mouseleave', ()=> ring.classList.remove('hover'));
+  });
+
+  // ---------- eased wheel smoothing (extra silkiness) ----------
+  let targetScroll = window.scrollY;
+  let currentScroll = window.scrollY;
+  let ticking = false;
+
+  window.addEventListener('wheel', e=>{
+    e.preventDefault();
+    targetScroll += e.deltaY;
+    targetScroll = Math.max(0, Math.min(targetScroll, document.body.scrollHeight - window.innerHeight));
+    if(!ticking){ requestAnimationFrame(smoothScroll); ticking = true; }
+  }, { passive:false });
+
+  function smoothScroll(){
+    currentScroll += (targetScroll - currentScroll) * 0.1;
+    if(Math.abs(targetScroll - currentScroll) < 0.5){
+      currentScroll = targetScroll;
+      ticking = false;
+    } else {
+      requestAnimationFrame(smoothScroll);
+    }
+    window.scrollTo(0, currentScroll);
+  }
+
+  window.addEventListener('scroll', ()=>{
+    if(!ticking){
+      targetScroll = window.scrollY;
+      currentScroll = window.scrollY;
+    }
+  });
+</script>
+
+</body>
+</html>
